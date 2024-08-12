@@ -3,7 +3,7 @@ name: Deploy Todo Application
 on: 
   push:
     branches:
-      - main
+      - main  # Adjust this if your default branch is named differently
 
 jobs:
   build:
@@ -27,7 +27,7 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: self-hosted
+    runs-on: self-hosted  # Adjust based on your deployment setup
     steps:
       - name: Pull image from Docker Hub
         run: docker pull yourdockerhubusername/todo-backend:latest
