@@ -16,20 +16,20 @@ jobs:
         run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
         
       - name: Build Docker Image
-        run: docker build -t yourdockerhubusername/todo-app .
+        run: docker build -t yourdockerhubusername/todo-backend .
         
       - name: Publish Image to Docker Hub
-        run: docker push yourdockerhubusername/todo-app:latest
+        run: docker push yourdockerhubusername/todo-backend:latest
 
   deploy:
     needs: build
     runs-on: self-hosted  # Adjust based on your deployment setup
     steps:
       - name: Pull image from Docker Hub
-        run: docker pull yourdockerhubusername/todo-app:latest
+        run: docker pull yourdockerhubusername/todo-backend:latest
         
       - name: Delete old container
         run: docker rm -f todo-app-container  # Ensure this matches the name of your container
         
       - name: Run Docker Container
-        run: docker run -d -p 3000:3000 --name todo-app-container -e MONGO_URI='${{ secrets.MONGO_URI }}' yourdockerhubusername/todo-app
+        run: docker run -d -p 3000:3000 --name todo-app-container -e MONGO_URI='${{ secrets.MONGO_URI }}' yourdockerhubusername/todo-backend
