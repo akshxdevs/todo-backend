@@ -3,7 +3,7 @@ name: Deploy Todo Application
 on: 
   push:
     branches:
-      - main  # Adjust this if your default branch is named differently
+      - main
 
 jobs:
   build:
@@ -13,7 +13,11 @@ jobs:
         uses: actions/checkout@v4
         
       - name: Login to Docker Hub
-        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        run: |
+          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         
       - name: Build Docker Image
         run: docker build -t yourdockerhubusername/todo-backend .
@@ -23,13 +27,13 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: self-hosted  # Adjust based on your deployment setup
+    runs-on: self-hosted
     steps:
       - name: Pull image from Docker Hub
         run: docker pull yourdockerhubusername/todo-backend:latest
         
       - name: Delete old container
-        run: docker rm -f todo-app-container  # Ensure this matches the name of your container
+        run: docker rm -f todo-app-container
         
       - name: Run Docker Container
         run: docker run -d -p 3000:3000 --name todo-app-container -e MONGO_URI='${{ secrets.MONGO_URI }}' yourdockerhubusername/todo-backend
