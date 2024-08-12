@@ -7,21 +7,21 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted  # Adjust as needed
+    runs-on: self-hosted  # or ubuntu-latest if using GitHub's runner
     steps:
       - name: Login to Docker Hub
         run: |
-          echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+          echo "$DOCKER_PASSWORD" | sudo docker login -u "$DOCKER_USERNAME" --password-stdin
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Pull image from Docker Hub
-        run: docker pull ${{ secrets.DOCKER_USERNAME }}/todo-backend:latest
+        run: sudo docker pull ${{ secrets.DOCKER_USERNAME }}/todo-backend:latest
 
       - name: Delete old container
-        run: docker rm -f todo-app-container
+        run: sudo docker rm -f todo-app-container
 
       - name: Run Docker Container
         run: |
-          docker run -d -p 3000:3000 --name todo-app-container -e MONGO_URI='${{ secrets.MONGO_URI }}' ${{ secrets.DOCKER_USERNAME }}/todo-backend:latest
+          sudo docker run -d -p 3000:3000 --name todo-app-container -e MONGO_URI='${{ secrets.MONGO_URI }}' ${{ secrets.DOCKER_USERNAME }}/todo-backend:latest
