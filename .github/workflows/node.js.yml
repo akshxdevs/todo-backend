@@ -3,7 +3,7 @@ name: Deploy Todo Application
 on: 
   push:
     branches:
-      - main  # Adjust this if your default branch is named differently
+      - main  # Adjust if necessary
 
 jobs:
   build:
@@ -20,20 +20,21 @@ jobs:
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
         
       - name: Build Docker Image
-        run: docker build -t yourdockerhubusername/todo-backend .
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/todo-backend:latest -f D:\codes\Projects\Github-projects\Projects\Project-1\todo-app\server\Dockerfile D:\codes\Projects\Github-projects\Projects\Project-1\todo-app\server
         
       - name: Publish Image to Docker Hub
-        run: docker push yourdockerhubusername/todo-backend:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/todo-backend:latest
 
   deploy:
     needs: build
-    runs-on: self-hosted  # Adjust based on your deployment setup
+    runs-on: self-hosted  # Adjust as needed
     steps:
       - name: Pull image from Docker Hub
-        run: docker pull yourdockerhubusername/todo-backend:latest
+        run: docker pull ${{ secrets.DOCKER_USERNAME }}/todo-backend:latest
         
       - name: Delete old container
         run: docker rm -f todo-app-container
         
       - name: Run Docker Container
-        run: docker run -d -p 3000:3000 --name todo-app-container -e MONGO_URI='${{ secrets.MONGO_URI }}' yourdockerhubusername/todo-backend
+        run: |
+          docker run -d -p 3000:3000 --name todo-app-container -e MONGO_URI='${{ secrets.MONGO_URI }}' ${{ secrets.DOCKER_USERNAME }}/todo-backend:latest
