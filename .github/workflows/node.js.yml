@@ -1,34 +1,35 @@
-name: Node.js CI
+name: Deploy Todo Application
 
-on:
+on: 
   push:
-    branches: [ "main" ]
+    branches:
+      - main  # Adjust this if your default branch is named differently
 
 jobs:
   build:
-
-    runs-on: self-hosted
-
-    strategy:
-      matrix:
-        node-version: [18.x]
-
+    runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
+      - name: Checkout Source
+        uses: actions/checkout@v4
+        
+      - name: Login to Docker Hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        
+      - name: Build Docker Image
+        run: docker build -t yourdockerhubusername/todo-app .
+        
+      - name: Publish Image to Docker Hub
+        run: docker push yourdockerhubusername/todo-app:latest
 
-    # Optional: Install pm2 if not already installed
-    # - run: |
-    #     if ! command -v pm2 &> /dev/null
-    #     then
-    #         npm install -g pm2
-    #     fi
-    
-    # # Restart the backend process with pm2
-    # - run: pm2 restart backend
+  deploy:
+    needs: build
+    runs-on: self-hosted  # Adjust based on your deployment setup
+    steps:
+      - name: Pull image from Docker Hub
+        run: docker pull yourdockerhubusername/todo-app:latest
+        
+      - name: Delete old container
+        run: docker rm -f todo-app-container  # Ensure this matches the name of your container
+        
+      - name: Run Docker Container
+        run: docker run -d -p 3000:3000 --name todo-app-container -e MONGO_URI='${{ secrets.MONGO_URI }}' yourdockerhubusername/todo-app
