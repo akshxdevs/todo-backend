@@ -4,7 +4,6 @@ const Todo = require("../Schema/todoSchema");
 const User = require("../Schema/userSchema");
 
 
-
 router.get("/:userid", async (req, res) => {
     try {
         const user = await User.findOne({ _id: req.params.userid });
