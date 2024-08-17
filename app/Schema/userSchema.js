@@ -2,9 +2,26 @@ const mongoose = require("mongoose");
 
 
 const UserSchema = new mongoose.Schema({
-    name:String,
-    password: String,
-    email:{type:String,lowercase:true}
+    name: {
+        type: String,
+        required: true,
+        trim: true,
+    },
+    password: {
+        type: String,
+        required: true,
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
+    }
+}, {
+    timestamps: true // Automatically adds `createdAt` and `updatedAt` fields
 });
 
-module.exports = mongoose.model("User",UserSchema);
+const User = mongoose.model("User",UserSchema);
+
+module.exports = User;
