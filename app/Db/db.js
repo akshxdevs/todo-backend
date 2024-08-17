@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const mongoURI = "mongodb+srv://aksh:aka123@atlascluster.zjyi9.mongodb.net/todo-app?retryWrites=true&w=majority";
+const mongoURI = "mongodb+srv://aksh:aka123@atlascluster.zjyi9.mongodb.net/";
 
 mongoose.connect(mongoURI, {
     dbName: "todo-app",
